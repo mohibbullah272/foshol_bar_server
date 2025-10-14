@@ -1,0 +1,9 @@
+model Investment {
+id Int @id @default(autoincrement())
+user User @relation(fields: [userId],references: [id])
+userId Int 
+project Project @relation(fields: [projectId],references: [id])
+projectId Int
+shareBought Int
+totalAmount Int
+}

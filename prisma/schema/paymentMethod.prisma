@@ -1,0 +1,9 @@
+model PaymentMethod {
+id Int @id @default(autoincrement())
+methodName PaymentMethods
+number Int 
+accountName String
+instruction String
+}
+
+

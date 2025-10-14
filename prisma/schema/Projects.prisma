@@ -1,0 +1,17 @@
+model Project {
+    id Int @id @default(autoincrement())
+    name String 
+    description String
+    totalShare String
+    sharePrice String
+    profitPerShare String
+    expireDate DateTime
+    Duration DateTime
+    location String 
+    progressUpdate String[] @default([])
+    createdAt DateTime @default(now())
+    updateAt DateTime @updatedAt
+
+
+    Investment Investment[]
+}
