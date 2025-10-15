@@ -2,12 +2,14 @@ model Project {
     id Int @id @default(autoincrement())
     name String 
     description String
+    image String[] 
     totalShare String
     sharePrice String
     profitPerShare String
     expireDate DateTime
     Duration DateTime
     location String 
+    progressUpdateImage String[] @default([])
     progressUpdate String[] @default([])
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
