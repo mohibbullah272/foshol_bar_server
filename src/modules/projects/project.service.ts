@@ -4,7 +4,7 @@ import prisma from "../../config/db";
 
 
 
-const getAllProject = async(searchTerm?:string,sortBy?:string,sortOrder?:string)=>{
+const getAllProject = async(searchTerm:string,sortBy:any,sortOrder:any)=>{
 
 const sortbyOption:string= sortBy ||"createdAt"
 const sortOrderOption :string = sortOrder || "desc"
@@ -78,4 +78,13 @@ const deleteProject = async(id:number)=>{
         }
     })
     return project
+}
+
+
+export const projectService = {
+getAllProject,
+getSingleProject,
+createProject,
+updateProject,
+deleteProject
 }

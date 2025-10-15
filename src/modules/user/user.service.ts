@@ -17,7 +17,8 @@ if(!payload.phone){
 const user = await prisma.user.findUnique({
     where:{
         phone:payload.phone
-    }
+    },
+ 
 })
 
 if(!user){
