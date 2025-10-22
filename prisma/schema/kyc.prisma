@@ -5,6 +5,10 @@ model KYC {
     nidNumber Int? @unique 
     birthCertificateNumber Int? @unique
     passportNumber Int? @unique
+    passportImage String?
+    birthCertificateImage String?
+    userImage String
+    nidImage String?
     status KycStatus @default(NOTREQUSTED)
 
 }

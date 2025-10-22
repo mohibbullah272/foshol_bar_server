@@ -6,6 +6,8 @@ import prisma from "./config/db";
 dotenv.config();
 
 let server: Server | null = null;
+const PORT = process.env.PORT || 10000;
+
 async function connectToDb() {
   try {
     await prisma.$connect()
@@ -20,8 +22,8 @@ async function startServer() {
   try {
     await connectToDb()
     server = http.createServer(app);
-    server.listen(process.env.PORT, () => {
-      console.log(`🚀 Server is running on port ${process.env.PORT}`);
+    server.listen(PORT,  () => {
+      console.log(`🚀 Server running on http://${PORT}`);
     });
 
     handleProcessEvents();

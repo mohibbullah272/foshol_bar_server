@@ -1,5 +1,3 @@
-
-import { Prisma } from "@prisma/client";
 import prisma from "../../config/db"
 
 
@@ -42,12 +40,44 @@ const result = await prisma.payment.findUnique({
 })
 return result
 }
-const makePayment = async(payload:Prisma.paymentCreateInput)=>{
-    const result = await prisma.payment.create({
-        data:payload
-    })
-    return result
-}
+const makePayment = async (payload: {
+    userId: number;
+    projectId: number;
+    method: any;
+    amount: number;
+    shareBought: number;
+    totalAmount: number;
+  }) => {
+  
+    const result = await prisma.$transaction(async (tx) => {
+   
+      const payment = await tx.payment.create({
+        data: {
+          method: payload.method,
+          amount: payload.amount,
+          status:"PENDING",
+          user: { connect: { id: payload.userId } },
+          project: { connect: { id: payload.projectId } },
+        },
+      });
+  
+      
+      const investment = await tx.investment.create({
+        data: {
+          user: { connect: { id: payload.userId } },
+          project: { connect: { id: payload.projectId } },
+          shareBought: payload.shareBought,
+          totalAmount: payload.totalAmount,
+          method:payload.method
+        },
+      });
+  
+      return { payment, investment };
+    });
+  
+    return result;
+  };
+  
 const getUsersPayment = async(userId:number)=>{
     const result = await prisma.payment.findMany({
         where:{

@@ -6,8 +6,8 @@ model User {
    photo String?
    address String? 
    phone String  @unique
-   role Role @default(USER)
-   status Status @default(NOTREQUSTED)
+   role Role @default(INVESTOR)
+   status Status @default(PENDING)
    createdAt DateTime @default(now())
   
   
@@ -18,13 +18,12 @@ model User {
 }
 
 enum Role {
-    USER
+   
     INVESTOR
     ADMIN
 }
 
 enum Status {
-    NOTREQUSTED
     PENDING
     APPROVED
     BLOCKED

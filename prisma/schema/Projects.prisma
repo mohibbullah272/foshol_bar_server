@@ -16,4 +16,5 @@ model Project {
 
 
     Investment Investment[]
+    payment payment[]
 }

@@ -4,13 +4,7 @@ import prisma from "../../config/db";
 
 
 const getAllPaymentMethod = async()=>{
-    const result = await prisma.paymentMethod.findMany({
-     select:{
-        id:true,
-        methodName:true
-     },
-     
-    })
+    const result = await prisma.paymentMethod.findMany()
     return result
 }
 
@@ -20,6 +14,7 @@ const getSpecificPaymentMethod = async(id:number)=>{
             id
         }
     })
+    return result
 }
 
 
@@ -51,6 +46,7 @@ const deletePaymentMethod = async(id:number)=>{
             id
         }
     })
+    return result
 }
 
 export const paymentMethodService={

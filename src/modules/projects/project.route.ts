@@ -11,6 +11,7 @@ const router = Router()
 
 router.get('/all',projectController.getAllProjects)
 router.get('/details/:id',projectController.getSingeProject)
+router.get('/project-progress',projectController.getProjectProgress)
 router.post('/create',projectController.createProject)
 router.patch("/update/:id",projectController.updateProject)
 router.delete('/delete/:id',projectController.deleteProject)

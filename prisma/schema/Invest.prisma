@@ -6,4 +6,8 @@ project Project @relation(fields: [projectId],references: [id])
 projectId Int
 shareBought Int
 totalAmount Int
+status paymentStatus @default(PENDING)
+method PaymentMethods @default(NAGAD)
+createdAt DateTime @default(now())
+
 }

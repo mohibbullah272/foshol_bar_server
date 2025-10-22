@@ -3,6 +3,8 @@ import { userRoute } from "../modules/user/user.route";
 import { projectRoute } from "../modules/projects/project.route";
 import { paymentMethodRoute } from "../modules/paymentMethod/method.route";
 import { paymentRoute } from "../modules/payment/payment.route";
+import { investmentRoute } from "../modules/investment/invest.route";
+import { kycRoute } from "../modules/kyc/kyc.route";
 
 
 
@@ -24,6 +26,14 @@ const moduleRoute =[
     {
         path:"/payments",
         route:paymentRoute
+    },
+    {
+        path:"/investment",
+        route:investmentRoute
+    },
+    {
+        path:"/kyc",
+        route:kycRoute
     }
 ]
 
