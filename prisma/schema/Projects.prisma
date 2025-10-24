@@ -11,10 +11,39 @@ model Project {
     location String 
     progressUpdateImage String[] @default([])
     progressUpdate String[] @default([])
+    progressUpdateDate DateTime[] @default([])
     createdAt DateTime @default(now())
     updateAt DateTime @updatedAt
-
+    category Category
+    keywords String[]
+    estimatedROI Float?      //it will be auto genarate not needed
+    roiCalculation String?   //it will be auto genarate not needed
 
     Investment Investment[]
     payment payment[]
+    @@map("project")
+}
+
+
+enum Category {
+  CROPS
+  LIVESTOCK
+  HORTICULTURE
+  FISHERIES
+  INPUT_SUPPLY
+  AGRO_INDUSTRY
+  FARM_EQUIPMENT
+  AGRI_TECH
+  IRRIGATION_SYSTEMS
+  SUSTAINABLE_FARMING
+  STORAGE_LOGISTICS
+  AGRICULTURAL_FINANCE
+  LAND_ACQUISITION
+  RENEWABLE_ENERGY
+  AGRICULTURAL_RESEARCH
+  VALUE_CHAIN_INTEGRATION
+  FORESTRY
+  PEST_DISEASE_CONTROL
+  WATER_MANAGEMENT
+  SOIL_HEALTH
 }
