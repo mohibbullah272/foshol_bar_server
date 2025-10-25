@@ -22,9 +22,10 @@ async function startServer() {
   try {
     await connectToDb()
     server = http.createServer(app);
-    server.listen(PORT,  () => {
-      console.log(`🚀 Server running on http://${PORT}`);
+    server.listen(Number(PORT), "0.0.0.0", () => {
+      console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
     });
+    
 
     handleProcessEvents();
   } catch (error) {
