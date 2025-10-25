@@ -1,3 +1,4 @@
+
 import { Prisma } from "@prisma/client";
 import prisma from "../../config/db";
 import calculateROI from "../../config/CalculateRoi";
@@ -210,7 +211,8 @@ const getProjectProgress = async(userId:number)=>{
                 select:{
                     name:true,
                     progressUpdate:true,
-                    progressUpdateImage:true
+                    progressUpdateImage:true,
+                    progressUpdateDate:true
                 }
             }
         }
