@@ -192,12 +192,28 @@ const updateProject = async (payload: Prisma.ProjectUpdateInput, id: number) => 
 }
 
 const deleteProject = async(id:number)=>{
-    const project = await prisma.project.delete({
-        where:{
-            id
-        }
+
+  const result = await prisma.$transaction(async(tnx)=>{
+    const investment = await tnx.investment.deleteMany({
+      where:{
+        projectId:id
+      }
     })
-    return project
+    const payment = await tnx.payment.deleteMany({
+      where:{
+        projectId:id
+      }
+    })
+    const project = await tnx.project.delete({
+      where:{
+        id
+      }
+    })
+
+    return {investment,project,payment}
+  })
+
+    return result
 }
 
 const getProjectProgress = async(userId:number)=>{
