@@ -1,29 +1,28 @@
 model Project {
-    id Int @id @default(autoincrement())
-    name String 
-    description String
-    image String[] 
-    totalShare String
-    sharePrice String
-    profitPerShare String
-    expireDate DateTime
-    Duration DateTime
-    location String 
-    progressUpdateImage String[] @default([])
-    progressUpdate String[] @default([])
-    progressUpdateDate DateTime[] @default([])
-    createdAt DateTime @default(now())
-    updateAt DateTime @updatedAt
-    category Category
-    keywords String[]
-    estimatedROI Float?      //it will be auto genarate not needed
-    roiCalculation String?   //it will be auto genarate not needed
+  id                  Int          @id @default(autoincrement())
+  name                String
+  description         String
+  image               String[]
+  totalShare          String
+  sharePrice          String
+  profitPerShare      String
+  expireDate          DateTime
+  Duration            DateTime
+  location            String
+  progressUpdateImage String[]     @default([])
+  progressUpdate      String[]     @default([])
+  progressUpdateDate  DateTime[]   @default([])
+  createdAt           DateTime     @default(now())
+  updateAt            DateTime     @updatedAt
+  category            Category
+  keywords            String[]
+  estimatedROI        Float?
+  roiCalculation      String?
+  Investment          Investment[]
+  payment             payment[]
 
-    Investment Investment[]
-    payment payment[]
-    @@map("project")
+  @@map("project")
 }
-
 
 enum Category {
   CROPS

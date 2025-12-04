@@ -5,6 +5,8 @@ import { paymentMethodRoute } from "../modules/paymentMethod/method.route";
 import { paymentRoute } from "../modules/payment/payment.route";
 import { investmentRoute } from "../modules/investment/invest.route";
 import { kycRoute } from "../modules/kyc/kyc.route";
+import { chatRoute } from "../Conversation/chat.route";
+
 
 
 
@@ -34,7 +36,14 @@ const moduleRoute =[
     {
         path:"/kyc",
         route:kycRoute
-    }
+    },
+   {
+    path:"/chat",
+    route:chatRoute
+   }
+      
+    
+ 
 ]
 
 moduleRoute.forEach(route=>router.use(route.path,route.route))

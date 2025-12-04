@@ -1,31 +1,27 @@
 model User {
-   id Int @id @default(autoincrement())
-   name String?
-   email String? @unique
-   password String 
-   photo String?
-   address String? 
-   phone String  @unique
-   role Role @default(INVESTOR)
-   status Status @default(PENDING)
-   createdAt DateTime @default(now())
-  
-  
-  
-   KYC KYC?
-   Investment Investment[] 
-   payment payment[]
+  id           Int            @id @default(autoincrement())
+  name         String?
+  email        String?        @unique
+  password     String
+  photo        String?
+  address      String?
+  phone        String         @unique
+  role         Role           @default(INVESTOR)
+  status       Status         @default(PENDING)
+  createdAt    DateTime       @default(now())
+  Conversation Conversation[]
+  Investment   Investment[]
+  KYC          KYC?
+  payment      payment[]
 }
 
 enum Role {
-   
-    INVESTOR
-    ADMIN
+  INVESTOR
+  ADMIN
 }
 
 enum Status {
-    PENDING
-    APPROVED
-    BLOCKED
+  PENDING
+  APPROVED
+  BLOCKED
 }
-

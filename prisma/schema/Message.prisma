@@ -1,0 +1,15 @@
+model Conversation {
+  id      Int       @id @default(autoincrement())
+  userId  Int
+  user    User      @relation(fields: [userId], references: [id])
+  Message Message[]
+}
+
+model Message {
+  id        Int          @id @default(autoincrement())
+  convoId   Int
+  Text      String
+  createdAt DateTime     @default(now())
+  senderRole Role
+  convo     Conversation @relation(fields: [convoId], references: [id])
+}

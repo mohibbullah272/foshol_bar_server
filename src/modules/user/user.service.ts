@@ -6,9 +6,24 @@ import prisma from "../../config/db";
 
 
 const createAccount = async(payload:Prisma.UserCreateInput)=>{
+
+
+    const IsUserExist = await prisma.user.findFirstOrThrow({
+        where:{
+            phone:payload.phone
+        }
+    })
+
+    if(IsUserExist && IsUserExist.phone === payload.phone){
+return Error("User Already Exist")
+    }
+
+
     const result = await prisma.user.create({
         data:payload
     })
+
+
     return result
 }
 

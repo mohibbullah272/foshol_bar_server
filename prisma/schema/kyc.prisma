@@ -1,21 +1,20 @@
 model KYC {
-    id Int @id @default(autoincrement())
-    user User @relation(fields: [userId], references: [id])
-    userId Int @unique
-    nidNumber Int? @unique 
-    birthCertificateNumber Int? @unique
-    passportNumber Int? @unique
-    passportImage String?
-    birthCertificateImage String?
-    userImage String
-    nidImage String?
-    status KycStatus @default(NOTREQUSTED)
-
+  id                     Int       @id @default(autoincrement())
+  userId                 Int       @unique
+  nidNumber              BigInt?   @unique
+  birthCertificateNumber BigInt?   @unique
+  passportNumber         BigInt?   @unique
+  passportImage          String?
+  birthCertificateImage  String?
+  userImage              String
+  nidImage               String?
+  status                 KycStatus @default(NOTREQUSTED)
+  user                   User      @relation(fields: [userId], references: [id])
 }
 
 enum KycStatus {
-    NOTREQUSTED
-    APPROVED
-    PENDING 
-    REJECTED
+  NOTREQUSTED
+  APPROVED
+  PENDING
+  REJECTED
 }

@@ -1,13 +1,12 @@
 model Investment {
-id Int @id @default(autoincrement())
-user User @relation(fields: [userId],references: [id])
-userId Int 
-project Project @relation(fields: [projectId],references: [id])
-projectId Int
-shareBought Int
-totalAmount Int
-status paymentStatus @default(PENDING)
-method PaymentMethods @default(NAGAD)
-createdAt DateTime @default(now())
-
+  id          Int            @id @default(autoincrement())
+  userId      Int
+  projectId   Int
+  shareBought Int
+  totalAmount Int
+  status      paymentStatus  @default(PENDING)
+  method      PaymentMethods @default(NAGAD)
+  createdAt   DateTime       @default(now())
+  project     Project        @relation(fields: [projectId], references: [id])
+  user        User           @relation(fields: [userId], references: [id])
 }

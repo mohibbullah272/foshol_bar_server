@@ -75,9 +75,9 @@ CREATE TABLE "User" (
 CREATE TABLE "KYC" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
-    "nidNumber" INTEGER,
-    "birthCertificateNumber" INTEGER,
-    "passportNumber" INTEGER,
+    "nidNumber" BIGINT,
+    "birthCertificateNumber" BIGINT,
+    "passportNumber" BIGINT,
     "passportImage" TEXT,
     "birthCertificateImage" TEXT,
     "userImage" TEXT NOT NULL,
