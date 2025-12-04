@@ -6,6 +6,7 @@ import { paymentRoute } from "../modules/payment/payment.route";
 import { investmentRoute } from "../modules/investment/invest.route";
 import { kycRoute } from "../modules/kyc/kyc.route";
 import { chatRoute } from "../Conversation/chat.route";
+import { NotificationRouter } from "../modules/Notification/Notification.route";
 
 
 
@@ -40,6 +41,10 @@ const moduleRoute =[
    {
     path:"/chat",
     route:chatRoute
+   },
+   {
+    path:"/notifications",
+    route:NotificationRouter
    }
       
     

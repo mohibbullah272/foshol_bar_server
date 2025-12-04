@@ -13,6 +13,10 @@ model User {
   Investment   Investment[]
   KYC          KYC?
   payment      payment[]
+
+ 
+
+  NotificationDeliver NotificationDeliver[]
 }
 
 enum Role {

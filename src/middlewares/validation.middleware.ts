@@ -36,7 +36,6 @@ export const validateUserFromRequest = async (req: AuthRequest, res: Response, n
     const userStatus = req.body?.userStatus || req.query?.userStatus;
 
 
-
     if (!userId) {
       return res.status(400).json({
         success: false,
