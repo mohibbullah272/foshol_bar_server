@@ -4,4 +4,5 @@ model PaymentMethod {
   number      Int
   accountName String
   instruction String
+
 }
