@@ -3,7 +3,6 @@ import { Server, Socket } from "socket.io";
 import prisma from "./db";
 import { addMessage, getConversationById } from "../Conversation/chat.service";
 import { UserRole } from "../types/conversation.types";
- // <-- adjust if needed
 
 interface AuthenticatedSocket extends Socket {
   user?: {
@@ -15,15 +14,16 @@ interface AuthenticatedSocket extends Socket {
 
 class SocketService {
   private io: Server;
-  private activeUsers = new Map<number, string>(); // userId -> last socketId
-  private userSockets = new Map<number, Set<string>>(); // userId -> all sockets
+  private activeUsers = new Map<number, string>();
+  private userSockets = new Map<number, Set<string>>();
 
   constructor(server: HttpServer) {
     this.io = new Server(server, {
       cors: {
-        origin: ["http://localhost:3000", "http://192.168.0.202:3000"],
+        origin: ["http://localhost:3000", "http://192.168.0.202:3000","https://fosholbari.com","https://fosholbari-client-v0-2-rft1.vercel.app"],
         methods: ["GET", "POST"],
         credentials: true,
+        allowedHeaders: ["Content-Type", "Authorization"]
       },
       connectionStateRecovery: {
         maxDisconnectionDuration: 2 * 60 * 1000,
@@ -31,12 +31,35 @@ class SocketService {
       },
     });
 
+    // ✅ ENHANCED: Better middleware with detailed logging
+    this.io.use(async (socket: AuthenticatedSocket, next) => {
+      try {
+        const handshakeUserId = socket.handshake.auth?.userId;
+        
+        if (!handshakeUserId) {
+          console.warn(`⚠️ Socket ${socket.id} connected without userId in handshake`);
+          return next(); // Allow connection but require authenticate event
+        }
+
+        console.log(`🔐 Authenticating socket ${socket.id} with userId: ${handshakeUserId}`);
+        const ok = await this.authenticateSocket(socket, handshakeUserId);
+        
+        if (!ok) {
+          console.error(`❌ Authentication failed for socket ${socket.id}`);
+          return next(new Error("Auth failed"));
+        }
+
+        console.log(`✅ Handshake auth successful for user ${handshakeUserId}`);
+        next();
+      } catch (err) {
+        console.error("💥 Handshake auth error:", err);
+        next(new Error("Authentication error"));
+      }
+    });
+
     this.setupEventHandlers();
   }
 
-  // -------------------------
-  // AUTHENTICATION
-  // -------------------------
   private async authenticateSocket(
     socket: AuthenticatedSocket,
     userId: number
@@ -47,6 +70,7 @@ class SocketService {
       });
 
       if (!user) {
+        console.error(`❌ User ${userId} not found in database`);
         socket.emit("authentication_error", { message: "User not found" });
         return false;
       }
@@ -57,54 +81,44 @@ class SocketService {
         status: user.status,
       };
 
+      console.log(`✅ User ${user.id} authenticated successfully`);
       return true;
     } catch (err) {
-      console.error("Authentication error:", err);
+      console.error("💥 Authentication error:", err);
       socket.emit("authentication_error", { message: "Authentication failed" });
       return false;
     }
   }
 
-  // -------------------------
-  // SOCKET EVENT HANDLERS
-  // -------------------------
   private setupEventHandlers() {
-    this.io.on("connection", (socket: AuthenticatedSocket) => {
-      console.log(`New socket: ${socket.id}`);
+    this.io.on("connection", async (socket: AuthenticatedSocket) => {
+      console.log(`🔌 New socket connected: ${socket.id}`);
 
-      // AUTH EVENT
+      // ✅ If already authenticated via handshake, complete setup
+      if (socket.user) {
+        console.log(`⚡ User ${socket.user.id} already authenticated via handshake`);
+        await this.completeAuthentication(socket);
+      }
+
+      // AUTH EVENT (for clients that don't send handshake auth)
       socket.on("authenticate", async (data: { userId: number }) => {
+        console.log(`🔐 Received authenticate event from socket ${socket.id}`);
+        
+        if (socket.user) {
+          console.log(`ℹ️ Socket ${socket.id} already authenticated, skipping`);
+          return;
+        }
+
         const ok = await this.authenticateSocket(socket, data.userId);
         if (!ok || !socket.user) return;
 
-        // Track socket
-        this.activeUsers.set(socket.user.id, socket.id);
-
-        if (!this.userSockets.has(socket.user.id)) {
-          this.userSockets.set(socket.user.id, new Set());
-        }
-        this.userSockets.get(socket.user.id)!.add(socket.id);
-
-        // Join personal room
-        socket.join(`user_${socket.user.id}`);
-
-        // Join all convos
-        await this.joinUserConversationRooms(socket);
-
-        socket.emit("authenticated", {
-          userId: socket.user.id,
-          role: socket.user.role,
-        });
-
-        console.log(`User authenticated: ${socket.user.id}`);
-
-        this.notifyAdminUserStatus(socket.user.id, true);
+        await this.completeAuthentication(socket);
       });
 
       // DISCONNECT
-      socket.on("disconnect", () => {
+      socket.on("disconnect", (reason) => {
         if (!socket.user) {
-          console.log(`Unauthed socket left: ${socket.id}`);
+          console.log(`🔴 Unauthed socket ${socket.id} disconnected: ${reason}`);
           return;
         }
 
@@ -116,27 +130,55 @@ class SocketService {
             this.userSockets.delete(socket.user.id);
             this.activeUsers.delete(socket.user.id);
             this.notifyAdminUserStatus(socket.user.id, false);
+            console.log(`🔴 User ${socket.user.id} fully disconnected`);
+          } else {
+            console.log(`🔴 User ${socket.user.id} disconnected one socket, ${userSockets.size} remaining`);
           }
         }
-
-        console.log(
-          `User disconnected ${socket.user.id}, remaining: ${
-            userSockets?.size || 0
-          }`
-        );
       });
 
       socket.on("reconnect_attempt", () =>
-        console.log(`Reconnecting: ${socket.id}`)
+        console.log(`🔄 Reconnecting: ${socket.id}`)
       );
 
       this.setupMessageHandlers(socket);
     });
   }
 
-  // -------------------------
-  // JOIN CONVERSATION ROOMS
-  // -------------------------
+  // ✅ NEW: Separate method for completing authentication setup
+  private async completeAuthentication(socket: AuthenticatedSocket) {
+    if (!socket.user) return;
+
+    try {
+      // Track socket
+      this.activeUsers.set(socket.user.id, socket.id);
+
+      if (!this.userSockets.has(socket.user.id)) {
+        this.userSockets.set(socket.user.id, new Set());
+      }
+      this.userSockets.get(socket.user.id)!.add(socket.id);
+
+      // Join personal room
+      socket.join(`user_${socket.user.id}`);
+      console.log(`👤 User ${socket.user.id} joined personal room`);
+
+      // Join all convos
+      await this.joinUserConversationRooms(socket);
+
+      socket.emit("authenticated", {
+        userId: socket.user.id,
+        role: socket.user.role,
+      });
+
+      console.log(`✅ User ${socket.user.id} fully authenticated and setup complete`);
+
+      this.notifyAdminUserStatus(socket.user.id, true);
+    } catch (err) {
+      console.error(`💥 Error completing authentication for user ${socket.user.id}:`, err);
+      socket.emit("operation_error", { message: "Setup failed" });
+    }
+  }
+
   private async joinUserConversationRooms(socket: AuthenticatedSocket) {
     if (!socket.user) return;
 
@@ -150,20 +192,19 @@ class SocketService {
         },
       });
 
+      console.log(`📚 User ${socket.user.id} joining ${conversations.length} conversations`);
+
       conversations.forEach((c) => {
         socket.join(`conversation_${c.id}`);
-        console.log(`User ${socket.user?.id} joined conversation_${c.id}`);
+        console.log(`  ✓ User ${socket.user?.id} joined conversation_${c.id}`);
       });
     } catch (err) {
-      console.error("Join convos error:", err);
+      console.error(`💥 Error joining conversations for user ${socket.user.id}:`, err);
+      throw err; // Propagate error to trigger operation_error emission
     }
   }
 
-  // -------------------------
-  // MESSAGE HANDLERS
-  // -------------------------
   private setupMessageHandlers(socket: AuthenticatedSocket) {
-    // SEND MESSAGE
     socket.on(
       "send_message",
       async (data: { conversationId: number; text: string; userId: number }) => {
@@ -173,7 +214,6 @@ class SocketService {
             return;
           }
 
-      
           const result = await addMessage(
             data.conversationId,
             data.text,
@@ -183,7 +223,6 @@ class SocketService {
 
           if (!result.success) {
             socket.emit('operation_error', { message: "something went wrong"  });
-
             return;
           }
 
@@ -206,14 +245,12 @@ class SocketService {
             this.notifyAdminNewMessage(messageWithUser, data.conversationId);
           }
         } catch (err) {
-          console.error("Message error:", err);
+          console.error("💥 Message error:", err);
           socket.emit('operation_error', { message:"failed to send message" });
-
         }
       }
     );
 
-    // JOIN CONVERSATION
     socket.on(
       "join_conversation",
       async (data: { conversationId: number; userId: number }) => {
@@ -228,19 +265,15 @@ class SocketService {
           userId: socket.user.id,
         });
 
-        console.log(
-          `User ${socket.user.id} joined conversation ${data.conversationId}`
-        );
+        console.log(`➕ User ${socket.user.id} joined conversation ${data.conversationId}`);
       }
     );
 
-    // LEAVE CONVERSATION
     socket.on("leave_conversation", (conversationId: number) => {
       socket.leave(`conversation_${conversationId}`);
       socket.emit("conversation_left", { conversationId });
     });
 
-    // TYPING EVENT
     socket.on(
       "typing",
       (data: { conversationId: number; isTyping: boolean; userId: number }) => {
@@ -255,7 +288,6 @@ class SocketService {
       }
     );
 
-    // GET FULL CONVERSATION
     socket.on(
       "get_conversation",
       async (data: { conversationId: number; userId: number }) => {
@@ -265,7 +297,6 @@ class SocketService {
             return;
           }
 
-      
           const result = await getConversationById(
             data.conversationId,
             socket.user.id,
@@ -279,16 +310,13 @@ class SocketService {
             });
           } else {
             socket.emit('operation_error', { message: result.error });
-
           }
         } catch (err) {
-            socket.emit('operation_error', { message: "failed to get conversation" });
-
+          socket.emit('operation_error', { message: "failed to get conversation" });
         }
       }
     );
 
-    // USER ACTIVE PING
     socket.on("user_active", (userId: number) => {
       if (socket.user && socket.user.id === userId) {
         this.activeUsers.set(userId, socket.id);
@@ -297,9 +325,6 @@ class SocketService {
     });
   }
 
-  // -------------------------
-  // NOTIFY ADMINS
-  // -------------------------
   private async notifyAdminUserStatus(userId: number, isOnline: boolean) {
     try {
       const admins = await prisma.user.findMany({
@@ -314,7 +339,7 @@ class SocketService {
         });
       });
     } catch (err) {
-      console.error("Admin notify error:", err);
+      console.error("💥 Admin notify error:", err);
     }
   }
 
@@ -332,13 +357,10 @@ class SocketService {
         });
       });
     } catch (err) {
-      console.error("Admin new msg error:", err);
+      console.error("💥 Admin new msg error:", err);
     }
   }
 
-  // -------------------------
-  // PUBLIC EMITTERS
-  // -------------------------
   public emitToUser(userId: number, event: string, data: any) {
     const sockets = this.userSockets.get(userId);
     if (!sockets) return;

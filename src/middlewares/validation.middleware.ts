@@ -166,7 +166,7 @@ export const requireAdminOrApprovedInvestor = (req: AuthRequest, res: Response, 
     return next();
   }
 
-  if (req.user.role === 'INVESTOR' && req.user.status === 'APPROVED') {
+  if (req.user.role === 'INVESTOR') {
     return next();
   }
 

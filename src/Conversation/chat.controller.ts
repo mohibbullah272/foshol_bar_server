@@ -232,6 +232,7 @@ export const handleGetAllConversations = async (req: AuthRequest, res: Response)
 // Get conversation by ID
 // In your backend controller
 export const handleGetConversationById = async (req: AuthRequest, res: Response) => {
+
   try {
     if (!req.user) {
       return res.status(401).json({ 
@@ -261,6 +262,7 @@ export const handleGetConversationById = async (req: AuthRequest, res: Response)
     //   messageCount: result.data?.messages?.length || 0,
     //   messages: result.data?.messages
     // });
+ 
 
     if (!result.success) {
       const statusCode = result?.error!.includes('Access denied') ? 403 : 400;
