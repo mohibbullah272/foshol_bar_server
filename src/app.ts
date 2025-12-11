@@ -13,7 +13,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/v1',router)
 app.use(cors({
-  origin: ["http://localhost:3000","https://foshol-bari-client.vercel.app"," http://192.168.0.202:3000"], // frontend origin
+  origin: ["http://localhost:3000","https://foshol-bari-client.vercel.app"," http://192.168.0.202:3000","https://fosholbari-client-v0-2-rft1.vercel.app"], // frontend origin
   
   credentials: true, // 👈 allow cookies
 }));
