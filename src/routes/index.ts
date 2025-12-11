@@ -7,6 +7,9 @@ import { investmentRoute } from "../modules/investment/invest.route";
 import { kycRoute } from "../modules/kyc/kyc.route";
 import { chatRoute } from "../Conversation/chat.route";
 import { NotificationRouter } from "../modules/Notification/Notification.route";
+import { ReviewRoute } from "../modules/Reviews/Review.route";
+import { chatbotRoute } from "../modules/chatbot/chat.route";
+import { pdfRoute } from "../modules/pdf/pdf.route";
 
 
 
@@ -45,7 +48,20 @@ const moduleRoute =[
    {
     path:"/notifications",
     route:NotificationRouter
+   },
+   {
+    path:"/review",
+    route:ReviewRoute
+   },
+   {
+    path:"/ai",
+    route:chatbotRoute
+   },
+   {
+    path:"/download/pdf",
+    route:pdfRoute
    }
+
       
     
  

@@ -204,13 +204,18 @@ const deleteProject = async(id:number)=>{
         projectId:id
       }
     })
+
+    const review = await tnx.rivew.deleteMany({
+      where:{
+        projectId:id
+      }
+    })
     const project = await tnx.project.delete({
       where:{
         id
       }
     })
-
-    return {investment,project,payment}
+    return {investment,project,payment,review}
   })
 
     return result

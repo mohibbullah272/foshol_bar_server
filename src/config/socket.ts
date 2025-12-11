@@ -1,6 +1,8 @@
 import { Server as HttpServer } from "http";
 import { Server, Socket } from "socket.io";
 import prisma from "./db";
+import { addMessage, getConversationById } from "../Conversation/chat.service";
+import { UserRole } from "../types/conversation.types";
  // <-- adjust if needed
 
 interface AuthenticatedSocket extends Socket {
@@ -171,16 +173,16 @@ class SocketService {
             return;
           }
 
-          const { addMessage } = require("../services/chat.service");
+      
           const result = await addMessage(
             data.conversationId,
             data.text,
             socket.user.id,
-            socket.user.role
+            socket.user.role as UserRole
           );
 
           if (!result.success) {
-            socket.emit('operation_error', { message: result.error });
+            socket.emit('operation_error', { message: "something went wrong"  });
 
             return;
           }
@@ -263,11 +265,11 @@ class SocketService {
             return;
           }
 
-          const { getConversationById } = require("../services/chat.service");
+      
           const result = await getConversationById(
             data.conversationId,
             socket.user.id,
-            socket.user.role
+            socket.user.role as UserRole
           );
 
           if (result.success) {

@@ -39,14 +39,12 @@ router.get(
 router.get(
   '/user/:userId',
   validateUserFromRequest as any,
-  requireAdminOrApprovedInvestor as any,
   getUserNotifications
 );
 
 router.get(
   '/user/:userId/latest',
   validateUserFromRequest as any,
-  requireAdminOrApprovedInvestor as any,
   getLatestNotifications
 );
 

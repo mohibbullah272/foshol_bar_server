@@ -17,6 +17,8 @@ model User {
  
 
   NotificationDeliver NotificationDeliver[]
+
+  Rivew Rivew[]
 }
 
 enum Role {

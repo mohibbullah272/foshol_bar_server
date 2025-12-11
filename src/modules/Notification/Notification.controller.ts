@@ -39,7 +39,7 @@ export const createNotification = catchAsyncAuth(async (req: AuthRequest, res: R
 export const getUserNotifications = catchAsyncAuth(async (req: AuthRequest, res: Response) => {
   const userId = parseInt(req.params.userId);
   const { page = "1", limit = "10" } = req.query;
-  
+
   const result = await notificationService.getUserNotifications(
     userId,
     parseInt(page as string),
@@ -58,7 +58,7 @@ export const getUserNotifications = catchAsyncAuth(async (req: AuthRequest, res:
 export const getLatestNotifications = catchAsyncAuth(async (req: AuthRequest, res: Response) => {
   const userId = parseInt(req.params.userId);
   const limit = parseInt(req.query.limit as string) || 5;
-  
+
   const result = await notificationService.getLatestNotifications(userId, limit);
 
   sendResponse(res, {

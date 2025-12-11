@@ -1,7 +1,7 @@
 model PaymentMethod {
   id          Int            @id @default(autoincrement())
   methodName  PaymentMethods
-  number      Int
+  number     String
   accountName String
   instruction String
 
